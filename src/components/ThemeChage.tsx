@@ -66,6 +66,7 @@ export const CustomizedSwitches = () => {
   const setTheme = useThemeStore((state) => state.setTheme)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, on: boolean) => {
+    void e // satisfies TS noUnusedParameters
     setTheme(on ? "dark" : "light")
   }
 
