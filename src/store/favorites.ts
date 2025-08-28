@@ -9,6 +9,7 @@ type Favorites = {
   toggleFavorite: (bill: Bill) => void
 }
 
+// For persisting new Map() in storage
 type SerializedMap<K, V> = { __type: "Map"; value: [K, V][] }
 
 const mapReplacer = <K, V>(_key: string, value: unknown): unknown =>
@@ -58,6 +59,7 @@ export const useFavoritesStore = create<Favorites>()(
     }),
     {
       name: "favorites",
+      // For persisting new Map() in storage
       storage: createJSONStorage(() => localStorage, {
         replacer: (key, value) => mapReplacer<string, Bill>(key, value),
         reviver: (key, value) => mapReviver<string, Bill>(key, value),

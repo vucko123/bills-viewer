@@ -2,7 +2,7 @@ import axios from "axios"
 import type {
   BillQueryKey,
   BillsResponse,
-  OireachtasBillsApi,
+  BillsApiResponse,
   RawBill,
 } from "../types/billTypes"
 
@@ -25,7 +25,7 @@ export const getBills = async ({
 
     const url = `${API_BASE_URL}?${queryParts.join("&")}`
 
-    const { data } = await axios.get<OireachtasBillsApi>(url)
+    const { data } = await axios.get<BillsApiResponse>(url)
 
     const formattedBills = data.results.map((item: RawBill) => ({
       uri: item.bill.uri,

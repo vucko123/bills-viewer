@@ -12,12 +12,12 @@ type SelectType = {
   onChange: (val: string) => void
 }
 
-export const SelectType: React.FC<SelectType> = ({
+export const SelectType = ({
   label = "Bill Type",
   billTypeOptions: options,
   filteredBillType: value,
   onChange,
-}) => {
+}: SelectType) => {
   const handleChange = (event: SelectChangeEvent) => {
     onChange(event.target.value as string)
   }

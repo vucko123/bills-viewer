@@ -47,7 +47,7 @@ export type BillQueryKey = {
   skip?: number
 }
 
-export type OireachtasBillsApi = {
+export type BillsApiResponse = {
   head: {
     counts: {
       billCount: number

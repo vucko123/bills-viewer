@@ -9,9 +9,9 @@ import App from "../App"
 const getSystemTheme = () =>
   window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light"
 
-export const GetSystemTheme = () => {
-  const mode = useThemeStore((s) => s.theme)
-  const setTheme = useThemeStore((s) => s.setTheme)
+export const ThemeSetter = () => {
+  const mode = useThemeStore((state) => state.theme)
+  const setTheme = useThemeStore((state) => state.setTheme)
 
   useEffect(() => {
     const saved = localStorage.getItem("theme")
