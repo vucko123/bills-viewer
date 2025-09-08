@@ -52,8 +52,8 @@ parliamentary bills.
 - `SelectType`: bill type filter
 - `FavoritesStore`: Zustand store for favorites
 - `useBillApi`: hook for fetching paginated bills
-- `MulitpleSelectFilter`: filter bills by status using API, if on favorites
-  filtering from persisted storage
+- `FilterMenu`: filter bills by status, year, date from, date to and last
+  updated using API, if on favorites filtering from persisted storage
 - `ThemeChange`: chekcks if there is in local storage presisted theme, otherwise
   takes current browser theme (It can be romoved from inspect -> application ->
   clear localStorage)
