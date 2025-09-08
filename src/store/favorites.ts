@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
-import type { Bill } from "../types/billTypes"
+import type { Bill } from "../types/billApiTypes"
 
 type Favorites = {
   favorites: Map<string, Bill>

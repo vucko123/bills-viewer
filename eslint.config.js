@@ -74,14 +74,7 @@ export default tseslint.config([
         "warn",
         { allowConstantExport: true },
       ],
-      "prettier/prettier": [
-        "error",
-        {
-          semi: false,
-          singleQuote: false,
-          usePrettierrc: true,
-        },
-      ],
     },
   },
 ])
+

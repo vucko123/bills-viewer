@@ -65,8 +65,7 @@ export const CustomizedSwitches = () => {
   const mode = useThemeStore((state) => state.theme)
   const setTheme = useThemeStore((state) => state.setTheme)
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, on: boolean) => {
-    void e // satisfies TS noUnusedParameters
+  const handleChange = (_e: ChangeEvent<HTMLInputElement>, on: boolean) => {
     setTheme(on ? "dark" : "light")
   }
 
@@ -78,7 +77,6 @@ export const CustomizedSwitches = () => {
             sx={{ m: 1 }}
             checked={mode === "dark"}
             onChange={handleChange}
-            inputProps={{ "aria-label": "Toggle dark mode" }}
           />
         }
         label={mode === "dark" ? "Dark" : "Light"}

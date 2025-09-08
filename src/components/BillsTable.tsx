@@ -6,15 +6,20 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TablePagination from "@mui/material/TablePagination"
 import TableRow from "@mui/material/TableRow"
-import type { Bill, Sponsor } from "../types/billTypes"
 import IconButton from "@mui/material/IconButton"
 import StarIcon from "@mui/icons-material/Star"
 import StarBorder from "@mui/icons-material/StarBorder"
-import { Skeleton } from "@mui/material"
+import { Box, Divider, Skeleton, TableSortLabel } from "@mui/material"
+import SortIcon from "@mui/icons-material/Sort"
+import FilterAltIcon from "@mui/icons-material/FilterAlt"
+import { RowRadioButtonsGroup } from "./common/RadioButtons"
+import { formatDate } from "../utils/utils"
+
 import type { ChangeEvent } from "react"
+import type { SortQuery, Bill, Sponsor } from "../types/uiTypes"
 
 type BillsTableProps = {
-  tableHeaders: string[]
+  tableHeaders: { label: string; sortable?: boolean }[]
   page: number
   rowsPerPage: number
   total: number
@@ -22,11 +27,17 @@ type BillsTableProps = {
   loading?: boolean
   selectSetFavorites?: Bill[]
   favorites: Map<string, Bill>
-  onPageChange: (page: number) => void
-  onRowsPerPageChange: (rows: number) => void
+  toggleSort: SortQuery | null
+  billTypeOptions: string[]
+  filteredBillType: string
   onRowClick?: (bill: Bill) => void
   handleOpen: (bill: Bill) => void
   toggleFavorite: (bill: Bill) => void
+  toggleFilterMenu: () => void
+  handleToggleSort?: (field: string, order: "asc" | "desc" | null) => void
+  handleChangeRowsPerPage: (e: ChangeEvent<HTMLInputElement>) => void
+  handleChangePage: (_e: unknown, newPage: number) => void
+  setFilteredBillType: (billType: string) => void
 }
 
 export const BillsTable = ({
@@ -37,20 +48,19 @@ export const BillsTable = ({
   bills,
   loading,
   favorites,
-  onPageChange,
-  onRowsPerPageChange,
+  toggleSort,
+  billTypeOptions,
+  filteredBillType,
   onRowClick,
   handleOpen,
   toggleFavorite,
+  toggleFilterMenu,
+  handleToggleSort,
+  handleChangeRowsPerPage,
+  handleChangePage,
+  setFilteredBillType,
 }: BillsTableProps) => {
-  const handleChangePage = (_e: unknown, newPage: number): void => {
-    onPageChange(newPage)
-  }
-
-  const handleChangeRowsPerPage = (e: ChangeEvent<HTMLInputElement>): void => {
-    onRowsPerPageChange(Number(e.target.value))
-    onPageChange(0)
-  }
+  const directionOrder = toggleSort?.order === "asc" ? "asc" : "desc"
 
   const formatSponsors = (sponsors: Sponsor[]) => {
     const result: string[] = []
@@ -70,33 +80,72 @@ export const BillsTable = ({
   const skeletonRows = Array.from({ length: Math.min(rowsPerPage, 12) })
 
   return (
-    <Paper sx={{ width: "100%", overflowX: "auto" }}>
+    <Paper elevation={8} sx={{ width: "100%", overflowX: "auto" }}>
       <TableContainer
         sx={{
           maxHeight: { xs: "calc(100vh - 350px)", sm: 440 },
           "& .MuiTableCell-stickyHeader": {
             backgroundColor: "background.paper",
             borderBottom: "1px solid",
-            borderColor: "divider",
             zIndex: 2,
             backdropFilter: "blur(4px)",
           },
         }}
       >
-        <Table stickyHeader size="small" aria-label="bills table">
+        <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
               <TableCell />
               {tableHeaders.map((item) => (
                 <TableCell
-                  key={item}
+                  key={item.label}
+                  sortDirection={false}
                   sx={{
+                    fontWeight: "bold",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {item}
+                  {item.sortable ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <SortIcon
+                        fontSize="small"
+                        sx={{
+                          mr: 0.5,
+                        }}
+                      />
+                      <TableSortLabel
+                        onClick={() => {
+                          handleToggleSort?.(item.label, directionOrder)
+                        }}
+                        active={item.label === toggleSort?.field}
+                        direction={directionOrder}
+                      >
+                        {item.label}
+                      </TableSortLabel>
+                    </Box>
+                  ) : (
+                    item.label
+                  )}
                 </TableCell>
               ))}
+              <TableCell
+                align="left"
+                onClick={() => {
+                  toggleFilterMenu()
+                }}
+              >
+                <FilterAltIcon
+                  fontSize="large"
+                  sx={{
+                    cursor: "pointer",
+                  }}
+                />
+              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -108,7 +157,7 @@ export const BillsTable = ({
                     <Skeleton variant="circular" width={24} height={24} />
                   </TableCell>
                   {tableHeaders.map((header) => (
-                    <TableCell key={`s-${String(i)}-${header}`}>
+                    <TableCell key={`s-${String(i)}-${header.label}`}>
                       <Skeleton />
                     </TableCell>
                   ))}
@@ -127,6 +176,9 @@ export const BillsTable = ({
               bills.length > 0 &&
               bills.map((bill) => (
                 <TableRow
+                  sx={{
+                    cursor: onRowClick ? "pointer" : "default",
+                  }}
                   key={bill.uri}
                   hover
                   role="button"
@@ -136,18 +188,13 @@ export const BillsTable = ({
                   <TableCell padding="normal" align="left">
                     <IconButton
                       size="small"
-                      aria-label={
-                        favorites.get(bill.uri)
-                          ? "Remove from favorites"
-                          : "Add to favorites"
-                      }
                       onClick={(e) => {
                         e.stopPropagation()
                         toggleFavorite(bill)
                       }}
                     >
                       {favorites.get(bill.uri) ? (
-                        <StarIcon sx={{ color: "#FDDA0D" }} />
+                        <StarIcon color="primary" />
                       ) : (
                         <StarBorder />
                       )}
@@ -160,21 +207,46 @@ export const BillsTable = ({
                   <TableCell>
                     {bill.sponsors.length > 0 && formatSponsors(bill.sponsors)}
                   </TableCell>
+                  <TableCell>{bill.billYear}</TableCell>
+                  <TableCell>{`${formatDate(String(new Date(bill.lastUpdated)))}`}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <Divider />
 
-      <TablePagination
-        component="div"
-        rowsPerPageOptions={[10, 25, 50, 100]}
-        count={total}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      <Paper sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "center" },
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <TablePagination
+            component="div"
+            sx={{
+              visibility: filteredBillType ? "hidden" : "visible",
+              pointerEvents: filteredBillType ? "none" : "auto",
+            }}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            count={total}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+
+          <RowRadioButtonsGroup
+            billTypeOptions={billTypeOptions}
+            filteredBillType={filteredBillType}
+            setFilteredBillType={setFilteredBillType}
+          />
+        </Box>
+      </Paper>
     </Paper>
   )
 }

@@ -1,10 +1,11 @@
-import { useState, type JSX } from "react"
+import { useState } from "react"
 import { Tab, Tabs } from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
 import { paragraphToText } from "../utils/utils"
-import type { SelectedBill } from "../hooks/useBillsTable"
+
+import type { SelectedBill } from "../types/uiTypes"
 
 type Lang = "English" | "Gaeilge"
 
@@ -16,7 +17,7 @@ export const TransitionsModal = ({
   handleClose: () => void
   open: boolean
   selectedBill: SelectedBill
-}): JSX.Element => {
+}) => {
   const [value, setValue] = useState<Lang>("English")
 
   return (

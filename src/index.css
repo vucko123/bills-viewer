@@ -1,0 +1,28 @@
+.loader {
+  width: 120px;
+  height: 20px;
+
+  --fg: var(--loader-fg, currentColor);
+  --bg: var(--loader-bg, #ddd);
+
+  -webkit-mask: radial-gradient(circle closest-side, #000 94%, #0000) left/20%
+    100%;
+  background: linear-gradient(var(--fg) 0 0) left/0% 100% no-repeat var(--bg);
+  animation: l17 2s infinite steps(6);
+}
+
+@keyframes l17 {
+  100% {
+    background-size: 120% 100%;
+  }
+}
+
+:root[data-theme="light"] {
+  --loader-fg: #0f172a;
+  --loader-bg: #e5e7eb;
+}
+
+:root[data-theme="dark"] {
+  --loader-fg: #ffffff;
+  --loader-bg: #374151;
+}

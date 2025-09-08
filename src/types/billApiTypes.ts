@@ -1,23 +1,5 @@
-export type SponsorRole = {
-  showAs: string | null
-}
+import type { Bill, Sponsor } from "./uiTypes"
 
-export type Sponsor = {
-  sponsor: {
-    as: SponsorRole
-    by: SponsorRole
-  }
-}
-
-export type Bill = {
-  uri: string
-  billNumber: string
-  billType: string
-  billStatus: string
-  longTitleEn: string
-  longTitleGa: string
-  sponsors: Sponsor[]
-}
 export type RawBill = {
   bill: {
     uri: string
@@ -26,6 +8,8 @@ export type RawBill = {
     status: string
     longTitleEn: string
     longTitleGa: string
+    lastUpdated: string
+    billYear: string
     sponsors: Sponsor[]
   }
 }
@@ -45,6 +29,10 @@ export type BillQueryKey = {
   limit: number
   billStatus?: string
   skip?: number
+  billYear?: string
+  dateFrom?: string
+  dateTo?: string
+  lastUpdated?: string
 }
 
 export type BillsApiResponse = {

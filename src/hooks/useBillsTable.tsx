@@ -1,32 +1,69 @@
-import { useState } from "react"
+import { useState, type ChangeEvent } from "react"
 import { BillsTable } from "../components/BillsTable"
-import { MultipleSelectFilter } from "../components/MultipleSelectFilter"
 import { TransitionsModal } from "../components/Modal"
-import type { Bill } from "../types/billTypes"
 import { useFavoritesStore } from "../store/favorites"
 import { Box } from "@mui/material"
-import { SelectType } from "../components/SelectType"
 import { useBillsData } from "./useBillsData"
-import IconButton from "@mui/material/IconButton"
-import Tooltip from "@mui/material/Tooltip"
-import DeleteIcon from "@mui/icons-material/Delete"
+import { FilterMenu } from "../components/FilterMenu"
+import { ChipStack } from "../components/common/ChipStack"
 
-const tableHeaders = ["Bill number", "Bill Type", "Bill Status", "Sponsor"]
+import { ClearTooltip } from "../components/common/ClearTooltip"
+import { stringifyQueryKey } from "../utils/utils"
 
-export type SelectedBill = {
-  titleEn: string
-  titleGa: string
+import type { Bill } from "../types/uiTypes"
+import type { FiltersOption, SelectedBill, SortQuery } from "../types/uiTypes"
+
+const tableHeaders: { label: string; sortable?: boolean }[] = [
+  { label: "Bill Number", sortable: true },
+  { label: "Bill Type", sortable: false },
+  { label: "Bill Status", sortable: false },
+  { label: "Sponsor", sortable: false },
+  { label: "Bill Year", sortable: true },
+  { label: "Last Updated", sortable: true },
+]
+
+const BillStatusFilters = [
+  "Current",
+  "Withdrawn",
+  "Enacted",
+  "Rejected",
+  "Defeated",
+  "Lapsed",
+] as const
+
+const INITIAL_FILTERS: FiltersOption = {
+  billStatus: [],
+  billYear: "",
+  lastUpdated: "",
+  fromDate: "",
+  toDate: "",
 }
 
 export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
-  const [currentPage, setCurrentPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
+  // state management for poppers
   const [openModal, setOpenModal] = useState(false)
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false)
   const [selectedBillTitles, setSelectedBillTitles] = useState<SelectedBill>({
     titleEn: "",
     titleGa: "",
   })
-  const [filteredBillByStatus, setFilteredBillByStatus] = useState<string[]>([])
+
+  // state management for Pagination
+  const [currentPage, setCurrentPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+
+  // state management for sorting
+  const [toggleSort, setToggleSort] = useState<SortQuery | null>({
+    field: "",
+    order: null,
+  })
+
+  const [stringifiedFiltersQueryKey, setStringifiedFiltersQueryKey] =
+    useState<string>(stringifyQueryKey(INITIAL_FILTERS))
+  const [filterOptions, setFilterOptions] =
+    useState<FiltersOption>(INITIAL_FILTERS)
+  const [chipFilters, setChipFilters] = useState<string[]>([])
+
   const [filteredBillType, setFilteredBillType] = useState("")
 
   const favorites = useFavoritesStore((state) => state.favorites)
@@ -56,14 +93,100 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   }
   const handleClose = () => setOpenModal(false)
 
-  const { bills, total, billTypeOptions, isFetching } = useBillsData({
+  const toggleFilterMenu = () => {
+    setFilterMenuOpen(!filterMenuOpen)
+  }
+
+  const handleChangePage = (_e: unknown, newPage: number): void => {
+    setCurrentPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = (e: ChangeEvent<HTMLInputElement>): void => {
+    setRowsPerPage(Number(e.target.value))
+    setCurrentPage(0)
+  }
+
+  const changeBillStatus = (billStatus: string) => {
+    setFilterOptions((state) => {
+      const newState = { ...state }
+      const current = state.billStatus ?? []
+      newState.billStatus = current.includes(billStatus)
+        ? current.filter((value) => value !== billStatus)
+        : [...current, billStatus]
+
+      return newState
+    })
+  }
+
+  const onChangeFilters = (selectedOptions: FiltersOption) => {
+    setFilterOptions((state) => {
+      const newState = { ...state }
+      const { billYear } = selectedOptions
+
+      if (selectedOptions.billStatus) {
+        changeBillStatus(selectedOptions.billStatus[0])
+      }
+
+      if (selectedOptions.billYear !== undefined) {
+        newState.billYear = selectedOptions.billYear ?? ""
+      }
+      if (selectedOptions.lastUpdated !== undefined) {
+        newState.lastUpdated = selectedOptions.lastUpdated ?? ""
+      }
+      if (selectedOptions.fromDate !== undefined) {
+        newState.fromDate = selectedOptions.fromDate ?? ""
+      }
+      if (selectedOptions.toDate !== undefined) {
+        newState.toDate = selectedOptions.toDate ?? ""
+      }
+
+      return newState
+    })
+  }
+
+  const { bills, total, isFetching, billTypeOptions } = useBillsData({
     isFavorites,
     page: currentPage,
     rowsPerPage,
-    filteredBillByStatus,
+    filteredBillByStatus: filterOptions.billStatus || [],
+    filterQuery: filterOptions,
     filteredBillType,
+    sortQuery: {
+      field: toggleSort?.field || "",
+      order: toggleSort?.order || null,
+    },
+    stringifiedApiQueryKey: stringifiedFiltersQueryKey,
   })
-  const hasAnyFilter = filteredBillByStatus.length > 0 || !!filteredBillType
+
+  const hasAnyFilter = Object.values(filterOptions).some(
+    (value) =>
+      (Array.isArray(value) && value.length > 0) ||
+      (!Array.isArray(value) && value),
+  )
+
+  const clearFilters = () => {
+    setFilterOptions(INITIAL_FILTERS)
+    setCurrentPage(0)
+    setStringifiedFiltersQueryKey(stringifyQueryKey(INITIAL_FILTERS))
+    setFilterMenuOpen(false)
+    setChipFilters([])
+    setFilteredBillType("")
+  }
+
+  const appyFiltersAndHashQueryKey = () => {
+    setCurrentPage(0)
+    setFilteredBillType("")
+    setStringifiedFiltersQueryKey(stringifyQueryKey(filterOptions))
+  }
+  const handleToggleSort = (field: string, order: "asc" | "desc" | null) => {
+    setToggleSort((prev) => {
+      if (prev?.field === field) {
+        const newOrder = prev.order === "asc" ? "desc" : "asc"
+        return { field, order: newOrder }
+      }
+      return { field, order }
+    })
+  }
 
   return (
     <>
@@ -74,49 +197,47 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
           selectedBill={selectedBillTitles}
         />
       )}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          gap: { xs: 1, sm: 2 },
-          alignItems: { xs: "stretch", sm: "center" },
-          mb: 1,
-        }}
-      >
-        <MultipleSelectFilter
-          filteredBillByStatus={filteredBillByStatus}
-          setFilteredBillByStatus={setFilteredBillByStatus}
+      {filterMenuOpen && (
+        <FilterMenu
+          setChipFilters={setChipFilters}
+          hasAnyFilter={hasAnyFilter}
+          clearFilters={clearFilters}
+          appyFiltersAndHashQueryKey={appyFiltersAndHashQueryKey}
+          onChangeFilters={onChangeFilters}
+          filterOptions={filterOptions}
+          checkboxList={Object.values(BillStatusFilters)}
+          open={filterMenuOpen}
+          onOpen={() => setFilterMenuOpen(true)}
+          onClose={() => setFilterMenuOpen(false)}
         />
+      )}
 
-        <SelectType
-          billTypeOptions={billTypeOptions}
-          filteredBillType={filteredBillType}
-          onChange={setFilteredBillType}
-        />
-        <Tooltip title="Clear all filters">
-          <span>
-            <IconButton
-              aria-label="clear filters"
-              onClick={() => {
-                setFilteredBillByStatus([])
-                setFilteredBillType("")
-                setCurrentPage(0)
-              }}
-              disabled={!hasAnyFilter}
-              sx={{
-                fontSize: "12px",
-                alignSelf: { xs: "flex-start", sm: "center" },
-                mt: { xs: 1, sm: 0 },
-              }}
-            >
-              <DeleteIcon />
-              Clear Filters
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
+      {chipFilters.length > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+
+            overflowX: "auto",
+            gap: { xs: 1, sm: 2 },
+            alignItems: { xs: "center", sm: "center" },
+            mb: 1,
+          }}
+        >
+          <ChipStack filters={chipFilters} />
+          <ClearTooltip
+            onClick={clearFilters ?? (() => {})}
+            hasAnyFilter={hasAnyFilter}
+          />
+        </Box>
+      )}
 
       <BillsTable
+        setFilteredBillType={setFilteredBillType}
+        filteredBillType={filteredBillType}
+        billTypeOptions={billTypeOptions}
+        toggleSort={toggleSort}
+        handleToggleSort={handleToggleSort}
+        toggleFilterMenu={toggleFilterMenu}
         handleOpen={handleOpen}
         tableHeaders={tableHeaders}
         page={currentPage}
@@ -124,8 +245,8 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
         total={total}
         bills={bills}
         loading={isFetching}
-        onPageChange={setCurrentPage}
-        onRowsPerPageChange={setRowsPerPage}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
         toggleFavorite={(bill) => toggleFavorite(bill)}
         favorites={favorites}
       />

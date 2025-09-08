@@ -2,8 +2,21 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import AllBillsView from "./pages/AllBillsView"
 import FavoriteBillsView from "./pages/FavoriteBillsView"
 import { NavigationTabs } from "./components/NavigationTabs"
+import { useEffect, useState } from "react"
+import SplashScreen from "./pages/SplashScreen"
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (showSplash) {
+    return <SplashScreen />
+  }
+
   return (
     <>
       <Routes>
