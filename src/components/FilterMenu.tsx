@@ -8,13 +8,12 @@ import { DateInputs } from "./common/DateInputs"
 import { ClearTooltip } from "./common/ClearTooltip"
 import { convertFiltersToArray } from "../utils/utils"
 import dayjs from "dayjs"
-
-import type { FiltersOption } from "../types/uiTypes"
+import type { FiltersOption } from "../hooks/useBillsTable"
 
 type FilterMenuProps = {
   filterOptions?: FiltersOption
   checkboxList?: string[]
-  open: boolean
+  filterMenuOpen: boolean
   hasAnyFilter?: boolean
   onChangeFilters: (selectedOptions: FiltersOption) => void
   onClose: () => void
@@ -25,7 +24,7 @@ type FilterMenuProps = {
 }
 
 export const FilterMenu = ({
-  open,
+  filterMenuOpen,
   checkboxList,
   filterOptions,
   hasAnyFilter,
@@ -135,7 +134,7 @@ export const FilterMenu = ({
         <SwipeableDrawer
           transitionDuration={{ enter: 500, exit: 500 }}
           anchor="left"
-          open={open}
+          open={filterMenuOpen}
           onClose={onClose}
           onOpen={onOpen ?? (() => {})}
         >

@@ -6,22 +6,22 @@ import type { ChangeEvent } from "react"
 
 type RadioButtonProps = {
   billTypeOptions: string[]
-  filteredBillType: string
-  setFilteredBillType: (billType: string) => void
+  billTypeFilter: string
+  setBillTypeFilter: (billType: string) => void
 }
 
 export const RowRadioButtonsGroup = ({
   billTypeOptions,
-  filteredBillType,
-  setFilteredBillType,
+  billTypeFilter,
+  setBillTypeFilter,
 }: RadioButtonProps) => {
   return (
     <FormControl>
       <RadioGroup
         row
-        value={filteredBillType || "Show All"}
+        value={billTypeFilter || "Show All"}
         onChange={(_e: ChangeEvent<HTMLInputElement>, value) => {
-          setFilteredBillType(value === "Show All" ? "" : value)
+          setBillTypeFilter(value === "Show All" ? "" : value)
         }}
       >
         <FormControlLabel

@@ -9,54 +9,50 @@ import type { ChangeEvent } from "react"
 import type { Bill } from "../types/billTypes"
 import { DataTableHeader } from "./common/table/DataTableHeader"
 import { DataTableBody } from "./common/table/DataTableBody"
-import type { SortQuery } from "../hooks/useBillsTable"
+import type { SortQuery, TableColumnProps } from "../hooks/useBillsTable"
 
 type BillsTableProps = {
-  tableHeaders: { label: string; sortable?: boolean }[]
+  tableColumns: TableColumnProps[]
   page: number
   rowsPerPage: number
-  total: number
+  totalResults: number
   bills: Bill[]
-  loading?: boolean
+  isLoading?: boolean
   selectSetFavorites?: Bill[]
   favorites: Map<string, Bill>
-  toggleSort: SortQuery | null
+  sortState: SortQuery | null
   billTypeOptions: string[]
-  filteredBillType: string
+  billTypeFilter: string
   onRowClick?: (bill: Bill) => void
-  handleOpen: (bill: Bill) => void
-  toggleFavorite: (bill: Bill) => void
-  toggleFilterMenu: () => void
-  handleToggleSort?: (field: string, order: "asc" | "desc" | null) => void
+  openLanguageModal: (bill: Bill) => void
+  toggleAddFavorite: (bill: Bill) => void
+  filterMenuOpenToggle: () => void
+  handleSortStateToggle?: (field: string, order: "asc" | "desc" | null) => void
   handleChangeRowsPerPage: (e: ChangeEvent<HTMLInputElement>) => void
-  handleChangePage: (_e: unknown, newPage: number) => void
-  setFilteredBillType: (billType: string) => void
+  paginationPageChange: (_e: unknown, newPage: number) => void
+  setBillTypeFilter: (billType: string) => void
 }
 
 export const BillsTable = ({
-  tableHeaders,
+  tableColumns,
   page,
   rowsPerPage,
-  total,
+  totalResults,
   bills,
-  loading,
+  isLoading,
   favorites,
-  toggleSort,
+  sortState,
   billTypeOptions,
-  filteredBillType,
+  billTypeFilter,
   onRowClick,
-  handleOpen,
-  toggleFavorite,
-  toggleFilterMenu,
-  handleToggleSort,
+  openLanguageModal,
+  toggleAddFavorite,
+  filterMenuOpenToggle,
+  handleSortStateToggle,
   handleChangeRowsPerPage,
-  handleChangePage,
-  setFilteredBillType,
+  paginationPageChange,
+  setBillTypeFilter,
 }: BillsTableProps) => {
-  const directionOrder = toggleSort?.order === "asc" ? "asc" : "desc"
-
-  const skeletonRows = Array.from({ length: Math.min(rowsPerPage, 12) })
-
   return (
     <Paper elevation={8} sx={{ width: "100%", overflowX: "auto" }}>
       <TableContainer
@@ -72,19 +68,18 @@ export const BillsTable = ({
       >
         <Table stickyHeader size="small">
           <DataTableHeader
-            toggleFilterMenu={toggleFilterMenu}
-            directionOrder={directionOrder}
-            toggleSort={toggleSort}
-            tableHeaders={tableHeaders}
-            handleToggleSort={handleToggleSort}
+            filterMenuOpenToggle={filterMenuOpenToggle}
+            sortState={sortState}
+            tableColumns={tableColumns}
+            handleSortStateToggle={handleSortStateToggle}
           />
 
           <DataTableBody
             data={bills}
-            tableHeaders={tableHeaders}
-            loading={loading ?? true}
-            handleOpen={handleOpen}
-            toggleFavorite={toggleFavorite}
+            tableColumns={tableColumns}
+            isLoading={isLoading ?? true}
+            openLanguageModal={openLanguageModal}
+            toggleAddFavorite={toggleAddFavorite}
             onRowClick={onRowClick}
             favorites={favorites}
           />
@@ -105,21 +100,21 @@ export const BillsTable = ({
           <TablePagination
             component="div"
             sx={{
-              visibility: filteredBillType ? "hidden" : "visible",
-              pointerEvents: filteredBillType ? "none" : "auto",
+              visibility: billTypeFilter ? "hidden" : "visible",
+              pointerEvents: billTypeFilter ? "none" : "auto",
             }}
             rowsPerPageOptions={[10, 25, 50, 100]}
-            count={total}
+            count={totalResults}
             page={page}
             rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
+            onPageChange={paginationPageChange}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
 
           <RowRadioButtonsGroup
             billTypeOptions={billTypeOptions}
-            filteredBillType={filteredBillType}
-            setFilteredBillType={setFilteredBillType}
+            billTypeFilter={billTypeFilter}
+            setBillTypeFilter={setBillTypeFilter}
           />
         </Box>
       </Paper>

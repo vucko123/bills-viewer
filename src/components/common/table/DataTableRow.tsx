@@ -9,7 +9,7 @@ type DataTableRowProps = {
   favorites: Map<string, Bill>
   clickable?: boolean
   onOpen: (bill: Bill) => void
-  onToggleFavorite: (bill: Bill) => void
+  toggleAddFavorite: (bill: Bill) => void
 }
 
 export const DataTableRow = ({
@@ -17,7 +17,7 @@ export const DataTableRow = ({
   favorites,
   clickable = true,
   onOpen,
-  onToggleFavorite,
+  toggleAddFavorite,
 }: DataTableRowProps) => {
   return (
     <TableRow
@@ -32,7 +32,7 @@ export const DataTableRow = ({
           size="small"
           onClick={(e) => {
             e.stopPropagation()
-            onToggleFavorite(bill)
+            toggleAddFavorite(bill)
           }}
         >
           {favorites.get(bill.uri) ? (

@@ -12,6 +12,11 @@ import { LanguageModal } from "../components/LanguageModal"
 
 import type { Bill } from "../types/billTypes"
 
+export type TableColumnProps = {
+  label: string
+  sortable?: boolean
+}
+
 export type SelectedBillTitles = {
   titleEn: string
   titleGa: string
@@ -30,7 +35,7 @@ export type FiltersOption = {
   toDate?: string
 }
 
-const tableHeaders: { label: string; sortable?: boolean }[] = [
+const tableColumns: TableColumnProps[] = [
   { label: "Bill Number", sortable: true },
   { label: "Bill Type", sortable: false },
   { label: "Bill Status", sortable: false },
@@ -70,7 +75,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
   // state management for sorting
-  const [toggleSort, setToggleSort] = useState<SortQuery | null>({
+  const [sortState, setSortState] = useState<SortQuery | null>({
     field: "",
     order: null,
   })
@@ -81,7 +86,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
     useState<FiltersOption>(INITIAL_FILTERS)
   const [chipFilters, setChipFilters] = useState<string[]>([])
 
-  const [filteredBillType, setFilteredBillType] = useState("")
+  const [billTypeFilter, setBillTypeFilter] = useState("")
 
   const favorites = useFavoritesStore((state) => state.favorites)
   const toggleAddFavorite = useFavoritesStore(
@@ -93,7 +98,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   )
 
   // handle modal open/close and set selected bill title
-  const handleOpenLanguageModal = (bill: Bill) => {
+  const openLanguageModal = (bill: Bill) => {
     if (!bill.longTitleEn) {
       setSelectedBillTitles((state) => ({
         ...state,
@@ -115,11 +120,11 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
     openModal()
   }
 
-  const toggleFilterMenuOpen = () => {
+  const filterMenuOpenToggle = () => {
     setFilterMenuOpen(!filterMenuOpen)
   }
 
-  const handlePaginationPageChange = (_e: unknown, newPage: number): void => {
+  const paginationPageChange = (_e: unknown, newPage: number): void => {
     setCurrentPage(newPage)
   }
 
@@ -173,10 +178,10 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
     rowsPerPage,
     filteredBillByStatus: filterOptions.billStatus || [],
     filterQuery: filterOptions,
-    filteredBillType,
+    filteredBillType: billTypeFilter,
     sortQuery: {
-      field: toggleSort?.field || "",
-      order: toggleSort?.order || null,
+      field: sortState?.field || "",
+      order: sortState?.order || null,
     },
     stringifiedApiQueryKey: stringifiedFiltersQueryKey,
   })
@@ -193,16 +198,19 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
     setStringifiedFiltersQueryKey(stringifyQueryKey(INITIAL_FILTERS))
     setFilterMenuOpen(false)
     setChipFilters([])
-    setFilteredBillType("")
+    setBillTypeFilter("")
   }
 
   const appyFiltersAndHashQueryKey = () => {
     setCurrentPage(0)
-    setFilteredBillType("")
+    setBillTypeFilter("")
     setStringifiedFiltersQueryKey(stringifyQueryKey(filterOptions))
   }
-  const handleToggleSort = (field: string, order: "asc" | "desc" | null) => {
-    setToggleSort((prev) => {
+  const handleSortStateToggle = (
+    field: string,
+    order: "asc" | "desc" | null,
+  ) => {
+    setSortState((prev) => {
       if (prev?.field === field) {
         const newOrder = prev.order === "asc" ? "desc" : "asc"
         return { field, order: newOrder }
@@ -223,7 +231,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
           onChangeFilters={onChangeFilters}
           filterOptions={filterOptions}
           checkboxList={Object.values(BillStatusFilters)}
-          open={filterMenuOpen}
+          filterMenuOpen={filterMenuOpen}
           onOpen={() => setFilterMenuOpen(true)}
           onClose={() => setFilterMenuOpen(false)}
         />
@@ -249,22 +257,22 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
       )}
 
       <BillsTable
-        setFilteredBillType={setFilteredBillType}
-        filteredBillType={filteredBillType}
+        setBillTypeFilter={setBillTypeFilter}
+        billTypeFilter={billTypeFilter}
         billTypeOptions={billTypeOptions}
-        toggleSort={toggleSort}
-        handleToggleSort={handleToggleSort}
-        toggleFilterMenu={toggleFilterMenuOpen}
-        handleOpen={handleOpenLanguageModal}
-        tableHeaders={tableHeaders}
+        sortState={sortState}
+        handleSortStateToggle={handleSortStateToggle}
+        filterMenuOpenToggle={filterMenuOpenToggle}
+        openLanguageModal={openLanguageModal}
+        tableColumns={tableColumns}
         page={currentPage}
         rowsPerPage={rowsPerPage}
-        total={total}
+        totalResults={total}
         bills={bills}
-        loading={isFetching}
-        handleChangePage={handlePaginationPageChange}
+        isLoading={isFetching}
+        paginationPageChange={paginationPageChange}
         handleChangeRowsPerPage={handlePaginationChangeRowsPerPage}
-        toggleFavorite={(bill) => toggleAddFavorite(bill)}
+        toggleAddFavorite={(bill) => toggleAddFavorite(bill)}
         favorites={favorites}
       />
     </>
