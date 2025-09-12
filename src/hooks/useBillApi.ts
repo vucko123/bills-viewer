@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query"
-import type { BillQueryKey } from "../types/billApiTypes"
+import type { BillQueryKey } from "../types/billTypes"
 import { getBills } from "../api/billsApi"
 
 export const useBillApi = ({

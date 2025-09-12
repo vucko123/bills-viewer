@@ -1,12 +1,12 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
-import type { Bill } from "../types/billApiTypes"
+import type { Bill } from "../types/billTypes"
 
 type Favorites = {
   favorites: Map<string, Bill>
   addFavorite: (bill: Bill) => void
   removeFavorite: (bill: Bill) => void
-  toggleFavorite: (bill: Bill) => void
+  toggleAddFavorite: (bill: Bill) => void
 }
 
 // For persisting new Map() in storage
@@ -44,7 +44,7 @@ export const useFavoritesStore = create<Favorites>()(
           return { favorites: next }
         }),
 
-      toggleFavorite: (bill) =>
+      toggleAddFavorite: (bill) =>
         set((state) => {
           const newBill = new Map(state.favorites)
           if (newBill.has(bill.uri)) {

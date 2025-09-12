@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import type { Sponsor } from "../types/billTypes"
 import type { FiltersOption } from "../hooks/useBillsTable"
 
 export const paragraphToText = (text: string) => {
@@ -42,4 +43,20 @@ export const normalizeFilters = (filters: FiltersOption) => {
     fromDate: filters.fromDate ?? "",
     toDate: filters.toDate ?? "",
   }
+}
+
+export const formatSponsors = (sponsors: Sponsor[]) => {
+  const result: string[] = []
+
+  Object.keys(sponsors).forEach((key: any) => {
+    const sponsor = sponsors[key].sponsor
+
+    const asShowAs = sponsor?.as?.showAs
+    const byShowAs = sponsor?.by?.showAs
+
+    if (asShowAs) result.push(asShowAs)
+    if (byShowAs) result.push(byShowAs)
+  })
+
+  return result
 }

@@ -1,17 +1,34 @@
 import { useState, type ChangeEvent } from "react"
 import { BillsTable } from "../components/BillsTable"
-import { TransitionsModal } from "../components/Modal"
 import { useFavoritesStore } from "../store/favorites"
 import { Box } from "@mui/material"
 import { useBillsData } from "./useBillsData"
 import { FilterMenu } from "../components/FilterMenu"
 import { ChipStack } from "../components/common/ChipStack"
-
 import { ClearTooltip } from "../components/common/ClearTooltip"
 import { stringifyQueryKey } from "../utils/utils"
+import { useModal } from "./useModal"
+import { LanguageModal } from "../components/LanguageModal"
 
-import type { Bill } from "../types/uiTypes"
-import type { FiltersOption, SelectedBill, SortQuery } from "../types/uiTypes"
+import type { Bill } from "../types/billTypes"
+
+export type SelectedBillTitles = {
+  titleEn: string
+  titleGa: string
+}
+
+export type SortQuery = {
+  field: string
+  order: "asc" | "desc" | null
+}
+
+export type FiltersOption = {
+  billStatus?: string[]
+  billYear?: string
+  lastUpdated?: string
+  fromDate?: string
+  toDate?: string
+}
 
 const tableHeaders: { label: string; sortable?: boolean }[] = [
   { label: "Bill Number", sortable: true },
@@ -41,12 +58,12 @@ const INITIAL_FILTERS: FiltersOption = {
 
 export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   // state management for poppers
-  const [openModal, setOpenModal] = useState(false)
   const [filterMenuOpen, setFilterMenuOpen] = useState(false)
-  const [selectedBillTitles, setSelectedBillTitles] = useState<SelectedBill>({
-    titleEn: "",
-    titleGa: "",
-  })
+  const [selectedBillTitles, setSelectedBillTitles] =
+    useState<SelectedBillTitles>({
+      titleEn: "",
+      titleGa: "",
+    })
 
   // state management for Pagination
   const [currentPage, setCurrentPage] = useState(0)
@@ -67,10 +84,16 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   const [filteredBillType, setFilteredBillType] = useState("")
 
   const favorites = useFavoritesStore((state) => state.favorites)
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite)
+  const toggleAddFavorite = useFavoritesStore(
+    (state) => state.toggleAddFavorite,
+  )
+
+  const { Modal, openModal } = useModal(
+    <LanguageModal selectedBillTitles={selectedBillTitles} />,
+  )
 
   // handle modal open/close and set selected bill title
-  const handleOpen = (bill: Bill) => {
+  const handleOpenLanguageModal = (bill: Bill) => {
     if (!bill.longTitleEn) {
       setSelectedBillTitles((state) => ({
         ...state,
@@ -89,19 +112,20 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
         titleGa: bill.longTitleGa,
       }))
     }
-    setOpenModal(true)
+    openModal()
   }
-  const handleClose = () => setOpenModal(false)
 
-  const toggleFilterMenu = () => {
+  const toggleFilterMenuOpen = () => {
     setFilterMenuOpen(!filterMenuOpen)
   }
 
-  const handleChangePage = (_e: unknown, newPage: number): void => {
+  const handlePaginationPageChange = (_e: unknown, newPage: number): void => {
     setCurrentPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (e: ChangeEvent<HTMLInputElement>): void => {
+  const handlePaginationChangeRowsPerPage = (
+    e: ChangeEvent<HTMLInputElement>,
+  ): void => {
     setRowsPerPage(Number(e.target.value))
     setCurrentPage(0)
   }
@@ -121,7 +145,6 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
   const onChangeFilters = (selectedOptions: FiltersOption) => {
     setFilterOptions((state) => {
       const newState = { ...state }
-      const { billYear } = selectedOptions
 
       if (selectedOptions.billStatus) {
         changeBillStatus(selectedOptions.billStatus[0])
@@ -190,13 +213,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
 
   return (
     <>
-      {openModal && (
-        <TransitionsModal
-          handleClose={handleClose}
-          open={openModal}
-          selectedBill={selectedBillTitles}
-        />
-      )}
+      <Modal />
       {filterMenuOpen && (
         <FilterMenu
           setChipFilters={setChipFilters}
@@ -237,17 +254,17 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
         billTypeOptions={billTypeOptions}
         toggleSort={toggleSort}
         handleToggleSort={handleToggleSort}
-        toggleFilterMenu={toggleFilterMenu}
-        handleOpen={handleOpen}
+        toggleFilterMenu={toggleFilterMenuOpen}
+        handleOpen={handleOpenLanguageModal}
         tableHeaders={tableHeaders}
         page={currentPage}
         rowsPerPage={rowsPerPage}
         total={total}
         bills={bills}
         loading={isFetching}
-        handleChangePage={handleChangePage}
-        handleChangeRowsPerPage={handleChangeRowsPerPage}
-        toggleFavorite={(bill) => toggleFavorite(bill)}
+        handleChangePage={handlePaginationPageChange}
+        handleChangeRowsPerPage={handlePaginationChangeRowsPerPage}
+        toggleFavorite={(bill) => toggleAddFavorite(bill)}
         favorites={favorites}
       />
     </>

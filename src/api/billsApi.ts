@@ -4,7 +4,7 @@ import type {
   BillsResponse,
   BillsApiResponse,
   RawBill,
-} from "../types/billApiTypes"
+} from "../types/billTypes"
 
 const API_BASE_URL = "https://api.oireachtas.ie/v1/legislation"
 

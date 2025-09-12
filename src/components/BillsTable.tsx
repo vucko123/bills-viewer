@@ -1,22 +1,15 @@
 import Paper from "@mui/material/Paper"
 import Table from "@mui/material/Table"
-import TableBody from "@mui/material/TableBody"
-import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
-import TableHead from "@mui/material/TableHead"
 import TablePagination from "@mui/material/TablePagination"
-import TableRow from "@mui/material/TableRow"
-import IconButton from "@mui/material/IconButton"
-import StarIcon from "@mui/icons-material/Star"
-import StarBorder from "@mui/icons-material/StarBorder"
-import { Box, Divider, Skeleton, TableSortLabel } from "@mui/material"
-import SortIcon from "@mui/icons-material/Sort"
-import FilterAltIcon from "@mui/icons-material/FilterAlt"
+import { Box, Divider } from "@mui/material"
 import { RowRadioButtonsGroup } from "./common/RadioButtons"
-import { formatDate } from "../utils/utils"
 
 import type { ChangeEvent } from "react"
-import type { SortQuery, Bill, Sponsor } from "../types/uiTypes"
+import type { Bill } from "../types/billTypes"
+import { TableHeader } from "./common/table/TableHeader"
+import { DataTableBody } from "./common/table/DataTableBody"
+import type { SortQuery } from "../hooks/useBillsTable"
 
 type BillsTableProps = {
   tableHeaders: { label: string; sortable?: boolean }[]
@@ -44,9 +37,9 @@ export const BillsTable = ({
   tableHeaders,
   page,
   rowsPerPage,
-  total,
+  total, // totalResults
   bills,
-  loading,
+  loading, // isLoading
   favorites,
   toggleSort,
   billTypeOptions,
@@ -62,21 +55,6 @@ export const BillsTable = ({
 }: BillsTableProps) => {
   const directionOrder = toggleSort?.order === "asc" ? "asc" : "desc"
 
-  const formatSponsors = (sponsors: Sponsor[]) => {
-    const result: string[] = []
-
-    Object.keys(sponsors).forEach((key: any) => {
-      const sponsor = sponsors[key].sponsor
-
-      const asShowAs = sponsor?.as?.showAs
-      const byShowAs = sponsor?.by?.showAs
-
-      if (asShowAs) result.push(asShowAs)
-      if (byShowAs) result.push(byShowAs)
-    })
-
-    return result
-  }
   const skeletonRows = Array.from({ length: Math.min(rowsPerPage, 12) })
 
   return (
@@ -93,125 +71,23 @@ export const BillsTable = ({
         }}
       >
         <Table stickyHeader size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              {tableHeaders.map((item) => (
-                <TableCell
-                  key={item.label}
-                  sortDirection={false}
-                  sx={{
-                    fontWeight: "bold",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.sortable ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <SortIcon
-                        fontSize="small"
-                        sx={{
-                          mr: 0.5,
-                        }}
-                      />
-                      <TableSortLabel
-                        onClick={() => {
-                          handleToggleSort?.(item.label, directionOrder)
-                        }}
-                        active={item.label === toggleSort?.field}
-                        direction={directionOrder}
-                      >
-                        {item.label}
-                      </TableSortLabel>
-                    </Box>
-                  ) : (
-                    item.label
-                  )}
-                </TableCell>
-              ))}
-              <TableCell
-                align="left"
-                onClick={() => {
-                  toggleFilterMenu()
-                }}
-              >
-                <FilterAltIcon
-                  fontSize="large"
-                  sx={{
-                    cursor: "pointer",
-                  }}
-                />
-              </TableCell>
-            </TableRow>
-          </TableHead>
+          <TableHeader
+            toggleFilterMenu={toggleFilterMenu}
+            directionOrder={directionOrder}
+            toggleSort={toggleSort}
+            tableHeaders={tableHeaders}
+            handleToggleSort={handleToggleSort}
+          />
 
-          <TableBody>
-            {loading &&
-              skeletonRows.map((_, i) => (
-                <TableRow key={`skeleton-${String(i)}`}>
-                  <TableCell padding="normal" align="left">
-                    <Skeleton variant="circular" width={24} height={24} />
-                  </TableCell>
-                  {tableHeaders.map((header) => (
-                    <TableCell key={`s-${String(i)}-${header.label}`}>
-                      <Skeleton />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-
-            {!loading && bills.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={tableHeaders.length + 1} align="center">
-                  No bills found.
-                </TableCell>
-              </TableRow>
-            )}
-
-            {!loading &&
-              bills.length > 0 &&
-              bills.map((bill) => (
-                <TableRow
-                  sx={{
-                    cursor: onRowClick ? "pointer" : "default",
-                  }}
-                  key={bill.uri}
-                  hover
-                  role="button"
-                  tabIndex={onRowClick ? 0 : -1}
-                  onClick={() => handleOpen(bill)}
-                >
-                  <TableCell padding="normal" align="left">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleFavorite(bill)
-                      }}
-                    >
-                      {favorites.get(bill.uri) ? (
-                        <StarIcon color="primary" />
-                      ) : (
-                        <StarBorder />
-                      )}
-                    </IconButton>
-                  </TableCell>
-
-                  <TableCell>{bill.billNumber}</TableCell>
-                  <TableCell>{bill.billType}</TableCell>
-                  <TableCell>{bill.billStatus}</TableCell>
-                  <TableCell>
-                    {bill.sponsors.length > 0 && formatSponsors(bill.sponsors)}
-                  </TableCell>
-                  <TableCell>{bill.billYear}</TableCell>
-                  <TableCell>{`${formatDate(String(new Date(bill.lastUpdated)))}`}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
+          <DataTableBody
+            data={bills}
+            tableHeaders={tableHeaders}
+            loading={loading ?? true}
+            handleOpen={handleOpen}
+            toggleFavorite={toggleFavorite}
+            onRowClick={onRowClick}
+            favorites={favorites}
+          />
         </Table>
       </TableContainer>
       <Divider />

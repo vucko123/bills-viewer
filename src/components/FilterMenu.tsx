@@ -49,8 +49,6 @@ export const FilterMenu = ({
       </List>
       <Divider />
       <List>
-        {`Bill Year:`}
-        <Divider sx={{ mb: 1 }} />
         <DateInputs
           currentValue={filterOptions?.billYear}
           label="Bill Year"
@@ -66,8 +64,6 @@ export const FilterMenu = ({
       <Divider />
 
       <List>
-        {`Last Updated:`}
-        <Divider sx={{ mb: 1 }} />
         <DateInputs
           currentValue={filterOptions?.lastUpdated}
           label="last Updated"
@@ -84,8 +80,6 @@ export const FilterMenu = ({
       <Divider />
 
       <List>
-        {`From Date:`}
-        <Divider sx={{ mb: 1 }} />
         <DateInputs
           currentValue={filterOptions?.fromDate}
           label="From Date "
@@ -101,8 +95,6 @@ export const FilterMenu = ({
       <Divider />
 
       <List>
-        {`To Date:`}
-        <Divider sx={{ mb: 1 }} />
         <DateInputs
           currentValue={filterOptions?.toDate}
           label="To Date"
