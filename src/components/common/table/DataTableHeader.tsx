@@ -1,7 +1,7 @@
 import { TableHead, TableRow, TableCell } from "@mui/material"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
 import SortIcon from "@mui/icons-material/Sort"
-import { HeaderCell } from "./HeaderCell"
+import { DataHeaderCell } from "./DataHeaderCell"
 import type { SortQuery } from "../../../hooks/useBillsTable"
 
 type TableHeaderProps = {
@@ -12,7 +12,7 @@ type TableHeaderProps = {
   toggleFilterMenu: () => void
 }
 
-export const TableHeader = ({
+export const DataTableHeader = ({
   tableHeaders,
   directionOrder,
   toggleSort,
@@ -24,14 +24,14 @@ export const TableHeader = ({
       <TableRow>
         <TableCell />
         {tableHeaders.map((item) => (
-          <HeaderCell
+          <DataHeaderCell
             key={item.label}
             label={item.label}
             sortable={!!item.sortable}
             active={item.label === toggleSort?.field}
             directionOrder={directionOrder}
             onSort={() => handleToggleSort?.(item.label, directionOrder)}
-            IconComponent={SortIcon}
+            icon={<SortIcon fontSize="small" />}
           />
         ))}
         <TableCell align="left" onClick={toggleFilterMenu}>

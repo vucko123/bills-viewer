@@ -1,9 +1,10 @@
-import { Tabs, Tab, Box, useMediaQuery, useTheme } from "@mui/material"
+import { Box, useMediaQuery, useTheme } from "@mui/material"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 import { CustomizedSwitches } from "../theme/ThemeChage"
 import DescriptionIcon from "@mui/icons-material/Description"
 import StarIcon from "@mui/icons-material/Star"
 import StarBorderIcon from "@mui/icons-material/StarBorder"
+import { TabsComponent } from "./common/TabsComponent"
 
 export const NavigationTabs = () => {
   const { pathname } = useLocation()
@@ -11,6 +12,28 @@ export const NavigationTabs = () => {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
+  const tabs = [
+    {
+      label: "All Bills",
+      value: "all",
+      icon: <DescriptionIcon fontSize="small" />,
+      component: NavLink,
+      to: "all",
+    },
+    {
+      label: "Favorites",
+      value: "favorites",
+      icon:
+        value === "favorites" ? (
+          <StarIcon fontSize="small" />
+        ) : (
+          <StarBorderIcon fontSize="small" />
+        ),
+      component: NavLink,
+      to: "favorites",
+    },
+  ]
 
   return (
     <Box sx={{ p: 1 }}>
@@ -23,53 +46,23 @@ export const NavigationTabs = () => {
         }}
       >
         <Box sx={{ display: { xs: "none", sm: "block" } }} />
-
-        <Tabs
+        <TabsComponent
           value={value}
-          aria-label="Bills navigation"
-          textColor="primary"
-          indicatorColor="primary"
+          tabs={tabs}
           centered={!isMobile}
           variant={isMobile ? "scrollable" : "standard"}
-          sx={{
-            justifySelf: "center",
-            maxWidth: "100%",
-            "& .MuiTab-root": {
+          tabProps={{
+            sx: {
               minHeight: 46,
               px: { xs: 1.25, sm: 2.5 },
             },
           }}
-        >
-          <Tab
-            label="All Bills"
-            value="all"
-            component={NavLink}
-            to="all"
-            icon={<DescriptionIcon fontSize="small" />}
-            iconPosition="start"
-          />
-          <Tab
-            icon={
-              value === "favorites" ? (
-                <StarIcon fontSize="small" />
-              ) : (
-                <StarBorderIcon fontSize="small" />
-              )
-            }
-            label="Favorites"
-            value="favorites"
-            component={NavLink}
-            to="favorites"
-            iconPosition="start"
-          />
-        </Tabs>
-
+        />
         <Box sx={{ justifySelf: "end" }}>
           <CustomizedSwitches />
         </Box>
       </Box>
 
-      {/* Content */}
       <Box sx={{ mt: 2 }}>
         <Outlet />
       </Box>

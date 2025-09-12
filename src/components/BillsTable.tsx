@@ -7,7 +7,7 @@ import { RowRadioButtonsGroup } from "./common/RadioButtons"
 
 import type { ChangeEvent } from "react"
 import type { Bill } from "../types/billTypes"
-import { TableHeader } from "./common/table/TableHeader"
+import { DataTableHeader } from "./common/table/DataTableHeader"
 import { DataTableBody } from "./common/table/DataTableBody"
 import type { SortQuery } from "../hooks/useBillsTable"
 
@@ -37,9 +37,9 @@ export const BillsTable = ({
   tableHeaders,
   page,
   rowsPerPage,
-  total, // totalResults
+  total,
   bills,
-  loading, // isLoading
+  loading,
   favorites,
   toggleSort,
   billTypeOptions,
@@ -71,7 +71,7 @@ export const BillsTable = ({
         }}
       >
         <Table stickyHeader size="small">
-          <TableHeader
+          <DataTableHeader
             toggleFilterMenu={toggleFilterMenu}
             directionOrder={directionOrder}
             toggleSort={toggleSort}

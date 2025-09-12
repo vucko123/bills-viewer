@@ -1,29 +1,29 @@
-import { DialogContent, DialogContentText, Tab, Tabs } from "@mui/material"
+import { DialogContent, DialogContentText } from "@mui/material"
+import { useState, type ChangeEvent, type SyntheticEvent } from "react"
 import { paragraphToText } from "../utils/utils"
-import { useState } from "react"
 import type { SelectedBillTitles } from "../hooks/useBillsTable"
-
-type Lang = "English" | "Gaeilge"
+import { TabsComponent } from "./common/TabsComponent"
 
 export const LanguageModal = ({
   selectedBillTitles,
 }: {
   selectedBillTitles: SelectedBillTitles
 }) => {
-  const [language, setLanguage] = useState("English")
+  const [language, setLanguage] = useState<string>("English")
+  const tabs = [
+    { label: "English", value: "English" },
+    { label: "Gaeilge", value: "Gaeilge" },
+  ]
+
   return (
     <>
-      <Tabs
+      <TabsComponent
         value={language}
-        textColor="primary"
-        indicatorColor="primary"
-        onChange={(_event, newValue: Lang) => {
+        onChange={(_e: SyntheticEvent<Element>, newValue) =>
           setLanguage(newValue)
-        }}
-      >
-        <Tab label="English" value="English" />
-        <Tab label="Gaeilge" value="Gaeilge" />
-      </Tabs>
+        }
+        tabs={tabs}
+      />
 
       <DialogContent>
         <DialogContentText id="scroll-dialog-description" tabIndex={-1}>

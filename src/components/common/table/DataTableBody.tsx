@@ -1,6 +1,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material"
 import { DataTableRow } from "./DataTableRow"
-import { DataTableSkeleton } from "./TableSkeleton"
+import { DataTableSkeleton } from "./DataTableSkeleton"
 import type { Bill } from "../../../types/billTypes"
 
 type DataTableBodyProps = {

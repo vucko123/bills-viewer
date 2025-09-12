@@ -1,6 +1,6 @@
 import { Box, TableCell, TableSortLabel } from "@mui/material"
 import SortIcon from "@mui/icons-material/Sort"
-import type { ElementType } from "react"
+import type { ReactNode } from "react"
 
 type HeaderCellProps = {
   label: string
@@ -8,18 +8,18 @@ type HeaderCellProps = {
   active?: boolean
   directionOrder: "asc" | "desc" | null
   onSort?: () => void
-  IconComponent?: ElementType
+  icon?: ReactNode
 }
 
-export const HeaderCell = ({
+export const DataHeaderCell = ({
   label,
   sortable = false,
   active = false,
   directionOrder,
   onSort,
-  IconComponent,
+  icon,
 }: HeaderCellProps) => {
-  const Icon = IconComponent ?? SortIcon
+  const iconNode = icon ?? <SortIcon fontSize="small" />
 
   return (
     <TableCell
@@ -28,11 +28,12 @@ export const HeaderCell = ({
     >
       {sortable ? (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Icon fontSize="small" sx={{ mr: 0.5 }} />
+          {iconNode}
           <TableSortLabel
             onClick={onSort}
             active={active}
             direction={directionOrder ?? "desc"}
+            sx={{ ml: 0.5 }}
           >
             {label}
           </TableSortLabel>
