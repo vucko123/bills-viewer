@@ -6,9 +6,9 @@ import type { SortQuery, TableColumnProps } from "../../../hooks/useBillsTable"
 
 type TableHeaderProps = {
   tableColumns: TableColumnProps[]
-  sortState: SortQuery | null
+  sortState?: SortQuery | null
   handleSortStateToggle?: (field: string, order: "asc" | "desc" | null) => void
-  filterMenuOpenToggle: () => void
+  filterMenuOpenToggle?: () => void
 }
 
 export const DataTableHeader = ({

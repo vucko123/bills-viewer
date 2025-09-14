@@ -1,54 +1,48 @@
-// TabsComponent.tsx
-import { Tabs, Tab } from "@mui/material"
+import { Tabs, Tab, type SxProps } from "@mui/material"
 import type { ElementType, ReactElement, SyntheticEvent } from "react"
 import { NavLink } from "react-router-dom"
 
 export type TabItem = {
   label: string
   value: string
-  icon?: ReactElement | string
+  icon?: ReactElement
   component?: ElementType
   to?: string
 }
 
 type TabsComponentProps = {
-  value: string
   tabs: TabItem[]
+  selectedTab: string
   centered?: boolean
-  variant?: "standard" | "scrollable" | "fullWidth"
-  tabProps?: object
-  onChange?: (_e: SyntheticEvent<Element>, newValue: string) => void
+  tabStyles?: SxProps
+  onTabChange?: (_e: SyntheticEvent<Element>, selectedTab: string) => void
 }
 
 export const TabsComponent = ({
-  value,
-  onChange,
+  selectedTab,
   tabs,
-  centered = false,
-  variant = "standard",
-  tabProps = {},
+  tabStyles = {},
+  onTabChange,
 }: TabsComponentProps) => {
   return (
     <Tabs
-      value={value}
-      onChange={onChange}
+      value={selectedTab}
+      onChange={onTabChange}
       textColor="primary"
       indicatorColor="primary"
-      centered={centered}
-      variant={variant}
+      variant="scrollable"
     >
       {tabs.map(({ label, value, icon, component, to }) => {
-        const safeIcon = icon
         return (
           <Tab
             key={value}
             label={label}
             value={value}
-            icon={safeIcon}
-            iconPosition={safeIcon ? "start" : undefined}
+            icon={icon}
+            iconPosition={icon ? "start" : undefined}
             component={component ?? NavLink}
             to={to}
-            {...tabProps}
+            {...tabStyles}
           />
         )
       })}

@@ -1,39 +1,30 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material"
+import { Box } from "@mui/material"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 import { CustomizedSwitches } from "../theme/ThemeChage"
 import DescriptionIcon from "@mui/icons-material/Description"
 import StarIcon from "@mui/icons-material/Star"
-import StarBorderIcon from "@mui/icons-material/StarBorder"
 import { TabsComponent } from "./common/TabsComponent"
+
+const tabs = [
+  {
+    label: "All Bills",
+    value: "all",
+    icon: <DescriptionIcon fontSize="small" />,
+    component: NavLink,
+    to: "all",
+  },
+  {
+    label: "Favorites",
+    value: "favorites",
+    icon: <StarIcon fontSize="small" />,
+    component: NavLink,
+    to: "favorites",
+  },
+]
 
 export const NavigationTabs = () => {
   const { pathname } = useLocation()
-  const value = pathname.includes("/bills/favorites") ? "favorites" : "all"
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-
-  const tabs = [
-    {
-      label: "All Bills",
-      value: "all",
-      icon: <DescriptionIcon fontSize="small" />,
-      component: NavLink,
-      to: "all",
-    },
-    {
-      label: "Favorites",
-      value: "favorites",
-      icon:
-        value === "favorites" ? (
-          <StarIcon fontSize="small" />
-        ) : (
-          <StarBorderIcon fontSize="small" />
-        ),
-      component: NavLink,
-      to: "favorites",
-    },
-  ]
+  const selected = pathname.includes("/bills/favorites") ? "favorites" : "all"
 
   return (
     <Box sx={{ p: 1 }}>
@@ -47,16 +38,9 @@ export const NavigationTabs = () => {
       >
         <Box sx={{ display: { xs: "none", sm: "block" } }} />
         <TabsComponent
-          value={value}
           tabs={tabs}
-          centered={!isMobile}
-          variant={isMobile ? "scrollable" : "standard"}
-          tabProps={{
-            sx: {
-              minHeight: 46,
-              px: { xs: 1.25, sm: 2.5 },
-            },
-          }}
+          selectedTab={selected}
+          tabStyles={{ px: { xs: 1.25, sm: 2.5 } }}
         />
         <Box sx={{ justifySelf: "end" }}>
           <CustomizedSwitches />

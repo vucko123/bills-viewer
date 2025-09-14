@@ -1,5 +1,5 @@
 import { DialogContent, DialogContentText } from "@mui/material"
-import { useState, type ChangeEvent, type SyntheticEvent } from "react"
+import { useState, type SyntheticEvent } from "react"
 import { paragraphToText } from "../utils/utils"
 import type { SelectedBillTitles } from "../hooks/useBillsTable"
 import { TabsComponent } from "./common/TabsComponent"
@@ -18,8 +18,8 @@ export const LanguageModal = ({
   return (
     <>
       <TabsComponent
-        value={language}
-        onChange={(_e: SyntheticEvent<Element>, newValue) =>
+        selectedTab={language}
+        onTabChange={(_e: SyntheticEvent<Element>, newValue) =>
           setLanguage(newValue)
         }
         tabs={tabs}
