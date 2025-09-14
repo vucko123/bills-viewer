@@ -26,7 +26,7 @@ type BillsTableProps = {
   onRowClick?: (bill: Bill) => void
   openLanguageModal: (bill: Bill) => void
   toggleAddFavorite: (bill: Bill) => void
-  filterMenuOpenToggle: () => void
+  onOpenFilterMenu: () => void
   handleSortStateToggle?: (field: string, order: "asc" | "desc" | null) => void
   handleChangeRowsPerPage: (e: ChangeEvent<HTMLInputElement>) => void
   paginationPageChange: (_e: unknown, newPage: number) => void
@@ -47,7 +47,7 @@ export const BillsTable = ({
   onRowClick,
   openLanguageModal,
   toggleAddFavorite,
-  filterMenuOpenToggle,
+  onOpenFilterMenu,
   handleSortStateToggle,
   handleChangeRowsPerPage,
   paginationPageChange,
@@ -68,7 +68,7 @@ export const BillsTable = ({
       >
         <Table stickyHeader size="small">
           <DataTableHeader
-            filterMenuOpenToggle={filterMenuOpenToggle}
+            onOpenFilterMenu={onOpenFilterMenu}
             sortState={sortState}
             tableColumns={tableColumns}
             handleSortStateToggle={handleSortStateToggle}

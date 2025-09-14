@@ -120,7 +120,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
     openModal()
   }
 
-  const filterMenuOpenToggle = () => {
+  const onOpenFilterMenu = () => {
     setFilterMenuOpen(!filterMenuOpen)
   }
 
@@ -262,7 +262,7 @@ export const useBillsTable = ({ isFavorites }: { isFavorites: boolean }) => {
         billTypeOptions={billTypeOptions}
         sortState={sortState}
         handleSortStateToggle={handleSortStateToggle}
-        filterMenuOpenToggle={filterMenuOpenToggle}
+        onOpenFilterMenu={onOpenFilterMenu}
         openLanguageModal={openLanguageModal}
         tableColumns={tableColumns}
         page={currentPage}

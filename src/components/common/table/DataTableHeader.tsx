@@ -1,4 +1,10 @@
-import { TableHead, TableRow, TableCell } from "@mui/material"
+import {
+  TableHead,
+  TableRow,
+  TableCell,
+  Tooltip,
+  IconButton,
+} from "@mui/material"
 import FilterAltIcon from "@mui/icons-material/FilterAlt"
 import SortIcon from "@mui/icons-material/Sort"
 import { DataHeaderCell } from "./DataHeaderCell"
@@ -8,14 +14,14 @@ type TableHeaderProps = {
   tableColumns: TableColumnProps[]
   sortState?: SortQuery | null
   handleSortStateToggle?: (field: string, order: "asc" | "desc" | null) => void
-  filterMenuOpenToggle?: () => void
+  onOpenFilterMenu?: () => void
 }
 
 export const DataTableHeader = ({
   tableColumns,
   sortState,
   handleSortStateToggle,
-  filterMenuOpenToggle,
+  onOpenFilterMenu,
 }: TableHeaderProps) => {
   const directionOrder = sortState?.order === "asc" ? "asc" : "desc"
 
@@ -34,8 +40,12 @@ export const DataTableHeader = ({
             icon={<SortIcon fontSize="small" />}
           />
         ))}
-        <TableCell align="left" onClick={filterMenuOpenToggle}>
-          <FilterAltIcon fontSize="large" sx={{ cursor: "pointer" }} />
+        <TableCell align="left">
+          <Tooltip title="Open filters">
+            <IconButton size="small" onClick={onOpenFilterMenu}>
+              <FilterAltIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
     </TableHead>
