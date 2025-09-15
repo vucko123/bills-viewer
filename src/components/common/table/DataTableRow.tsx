@@ -1,4 +1,4 @@
-import { IconButton, TableCell, TableRow } from "@mui/material"
+import { IconButton, TableCell, TableRow, Tooltip } from "@mui/material"
 import StarIcon from "@mui/icons-material/Star"
 import StarBorder from "@mui/icons-material/StarBorder"
 import type { Bill } from "../../../types/billTypes"
@@ -28,19 +28,21 @@ export const DataTableRow = ({
       onClick={() => onOpen(bill)}
     >
       <TableCell padding="normal" align="left">
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation()
-            toggleAddFavorite(bill)
-          }}
-        >
-          {favorites.get(bill.uri) ? (
-            <StarIcon color="primary" />
-          ) : (
-            <StarBorder />
-          )}
-        </IconButton>
+        <Tooltip title="Add to Favorties">
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleAddFavorite(bill)
+            }}
+          >
+            {favorites.get(bill.uri) ? (
+              <StarIcon color="primary" />
+            ) : (
+              <StarBorder />
+            )}
+          </IconButton>
+        </Tooltip>
       </TableCell>
 
       <TableCell>{bill.billNumber}</TableCell>

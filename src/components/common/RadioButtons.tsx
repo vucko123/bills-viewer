@@ -3,6 +3,7 @@ import RadioGroup from "@mui/material/RadioGroup"
 import FormControlLabel from "@mui/material/FormControlLabel"
 import FormControl from "@mui/material/FormControl"
 import type { ChangeEvent } from "react"
+import { Tooltip } from "@mui/material"
 
 type RadioButtonProps = {
   billTypeOptions: string[]
@@ -24,19 +25,23 @@ export const RowRadioButtonsGroup = ({
           setBillTypeFilter(value === "Show All" ? "" : value)
         }}
       >
-        <FormControlLabel
-          value="Show All"
-          control={<Radio />}
-          label="Show All"
-        />
+        <Tooltip title="Show All Bills">
+          <FormControlLabel
+            value="Show All"
+            control={<Radio />}
+            label="Show All"
+          />
+        </Tooltip>
         {billTypeOptions.length > 1 &&
           billTypeOptions.map((item) => (
-            <FormControlLabel
-              key={item}
-              value={item}
-              control={<Radio />}
-              label={item}
-            />
+            <Tooltip title={`Filter All ${item} Bills for this page`}>
+              <FormControlLabel
+                key={item}
+                value={item}
+                control={<Radio />}
+                label={item}
+              />
+            </Tooltip>
           ))}
       </RadioGroup>
     </FormControl>
