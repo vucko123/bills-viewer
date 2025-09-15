@@ -15,25 +15,24 @@ const defaultHeaders = [
 const baseProps = (
   overrides?: Partial<Parameters<typeof BillsTable>[0]>,
 ): Parameters<typeof BillsTable>[0] => ({
-  tableHeaders: [...defaultHeaders],
+  tableColumns: [...defaultHeaders],
   page: 0,
   rowsPerPage: 10,
-  total: 0,
+  totalResults: 0,
   bills: [],
-  loading: false,
+  isLoading: false,
   favorites: new Map<string, any>(),
-  // required props for the component
-  toggleSort: { field: "", order: null },
+  sortState: { field: "", order: null },
   billTypeOptions: [],
-  filteredBillType: "",
+  billTypeFilter: "",
   onRowClick: vi.fn(),
-  handleOpen: vi.fn(),
-  toggleFavorite: vi.fn(),
-  toggleFilterMenu: vi.fn(),
-  handleToggleSort: vi.fn(),
+  openLanguageModal: vi.fn(),
+  toggleAddFavorite: vi.fn(),
+  onOpenFilterMenu: vi.fn(),
+  handleSortStateToggle: vi.fn(),
   handleChangeRowsPerPage: vi.fn(),
-  handleChangePage: vi.fn(),
-  setFilteredBillType: vi.fn(),
+  paginationPageChange: vi.fn(),
+  setBillTypeFilter: vi.fn(),
   ...overrides,
 })
 
@@ -42,7 +41,7 @@ describe("BillsTable", () => {
     const props = baseProps()
     render(<BillsTable {...props} />)
 
-    props.tableHeaders.forEach((h) => {
+    props.tableColumns.forEach((h) => {
       expect(
         screen.getByRole("columnheader", { name: h.label }),
       ).toBeInTheDocument()
@@ -72,16 +71,16 @@ describe("BillsTable", () => {
       ],
     }
 
-    const handleOpen = vi.fn()
-    const toggleFavorite = vi.fn()
+    const openLanguageModal = vi.fn()
+    const toggleAddFavorite = vi.fn()
 
     render(
       <BillsTable
         {...baseProps({
           bills: [bill],
-          total: 1,
-          handleOpen,
-          toggleFavorite,
+          totalResults: 1,
+          openLanguageModal,
+          toggleAddFavorite,
         })}
       />,
     )
@@ -109,8 +108,8 @@ describe("BillsTable", () => {
     const favButton = within(firstCell).getByRole("button")
     fireEvent.click(favButton)
 
-    expect(toggleFavorite).toHaveBeenCalledTimes(1)
-    expect(toggleFavorite).toHaveBeenCalledWith(bill)
-    expect(handleOpen).not.toHaveBeenCalled()
+    expect(toggleAddFavorite).toHaveBeenCalledTimes(1)
+    expect(toggleAddFavorite).toHaveBeenCalledWith(bill)
+    expect(openLanguageModal).not.toHaveBeenCalled()
   })
 })

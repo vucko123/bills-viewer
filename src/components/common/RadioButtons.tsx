@@ -34,7 +34,10 @@ export const RowRadioButtonsGroup = ({
         </Tooltip>
         {billTypeOptions.length > 1 &&
           billTypeOptions.map((item) => (
-            <Tooltip title={`Filter All ${item} Bills for this page`}>
+            <Tooltip
+              title={`Filter All ${item} Bills for this page`}
+              key={`billtype-${item}`}
+            >
               <FormControlLabel
                 key={item}
                 value={item}
