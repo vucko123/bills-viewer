@@ -2,8 +2,7 @@ import { useMemo } from "react"
 import { useBillApi } from "./useBillApi"
 import { useFavoritesStore } from "../store/favorites"
 import { formatDate, normalizeFilters } from "../utils/utils"
-
-import type { SortQuery, FiltersOption } from "../types/uiTypes"
+import type { FiltersOption, SortQuery } from "./useBillsTable"
 
 type UseBillsData = {
   isFavorites: boolean
